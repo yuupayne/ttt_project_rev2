@@ -10,7 +10,8 @@ using Board = std::array<std::array<std::string, kBoardSize>, kBoardSize>;
 
 // 画面をクリアする（追記方式にならないようにする）
 void ClearScreen() {
-    std::cout << "\x1B[2J\x1B[H";
+    //std::cout << "\x1B[2J\x1B[H";
+    std::cout << "\n";
 }
 
 // 盤面を初期化する
@@ -25,11 +26,13 @@ void InitializeBoard(Board &board) {
 // 盤面を描画する（5行の固定フォーマット）
 void DrawBoard(const Board &board) {
     for (int row = 0; row < kBoardSize; ++row) {
-        std::cout << " " << board[row][0] << " | " << board[row][1] << " | " << board[row][2] << "\n";
+        std::cout << " " << board[row][0] << " | " << board[row][1] << " | " << board[row][2] << 
+        "\t" << " " << row*3+1 << " | " << row*3+2 << " | " << row*3+3 << "\n";
         if (row != kBoardSize - 1) {
-            std::cout << "---+---+---\n";
+            std::cout << "---+---+---\t---+---+---\n";
         }
     }
+    std::cout << "\n";
 }
 
 // 勝利判定を行う
@@ -75,7 +78,8 @@ bool ReadMove(int &out_row, int &out_col) {
     }
 
     if (input.size() != 1 || input[0] < '1' || input[0] > '9') {
-        std::cout << "1〜9の数字を入力してください。\n";
+        std::cout << "\n不正な入力です。\n";
+        std::cout << "任意のマス目に対応した1〜9の数字を入力してください。\n";
         return false;
     }
 
@@ -98,7 +102,7 @@ int main() {
             ClearScreen();
             DrawBoard(board);
             std::cout << player_names[current_player] << "の番です\n";
-            std::cout << "1〜9を入力してください: ";
+            std::cout << "任意のマス目に対応した1〜9を入力してください: ";
 
             int row = 0;
             int col = 0;
@@ -107,7 +111,7 @@ int main() {
             }
 
             if (board[row][col] != " ") {
-                std::cout << "既に配置済みのマスです。\n";
+                std::cout << "\n既に配置済みのマスです。\n";
                 continue;
             }
 
@@ -117,7 +121,7 @@ int main() {
                 ClearScreen();
                 DrawBoard(board);
                 std::cout << player_names[current_player] << "（" << player_symbols[current_player]
-                          << "）\n";
+                          << "）が勝ちました！\n";
                 break;
             }
 
