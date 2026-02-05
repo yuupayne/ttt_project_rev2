@@ -2,6 +2,10 @@
 #include <iostream>
 #include <string>
 
+#ifdef _WIN32
+  #include <windows.h>
+#endif
+
 // 盤面サイズ
 constexpr int kBoardSize = 3;
 
@@ -89,10 +93,24 @@ bool ReadMove(int &out_row, int &out_col) {
     return true;
 }
 
+// Windows のコンソールに対して UTF-8 を指定
+// （cmd / PowerShell / Windows Terminal のいずれでも基本はここが効きます）
+static void setup_utf8_console_for_cout() {
+#ifdef _WIN32
+  SetConsoleOutputCP(CP_UTF8);
+  SetConsoleCP(CP_UTF8);
+
+  // 参考：Cランタイム側のコードページは触らないのが無難（環境依存で崩れることがある）
+  // std::cout を前提にするなら _setmode(stdout, _O_U8TEXT) は基本的に避ける
+#endif
+}
+
 int main() {
+    setup_utf8_console_for_cout();
+
     Board board{};
     const std::array<std::string, 2> player_names = {"Player1", "Player2"};
-    const std::array<std::string, 2> player_symbols = {"〇", "×"};
+    const std::array<std::string, 2> player_symbols = {"o", "×"};
 
     while (true) {
         InitializeBoard(board);
@@ -101,7 +119,8 @@ int main() {
         while (true) {
             ClearScreen();
             DrawBoard(board);
-            std::cout << player_names[current_player] << "の番です\n";
+            std::cout << player_names[current_player] << "の番です" 
+                      << "（シンボル：" << player_symbols[current_player] << "）\n";
             std::cout << "任意のマス目に対応した1〜9を入力してください: ";
 
             int row = 0;
@@ -120,7 +139,7 @@ int main() {
             if (CheckWin(board, player_symbols[current_player])) {
                 ClearScreen();
                 DrawBoard(board);
-                std::cout << player_names[current_player] << "（" << player_symbols[current_player]
+                std::cout << player_names[current_player] << "（シンボル：" << player_symbols[current_player]
                           << "）が勝ちました！\n";
                 break;
             }
